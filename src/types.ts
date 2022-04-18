@@ -18,3 +18,8 @@ export interface UserToken {
   username: string;
   id: string;
 }
+
+export interface UserLoginCreds {
+  username: string;
+  password: string;
+}

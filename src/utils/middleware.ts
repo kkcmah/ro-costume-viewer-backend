@@ -12,11 +12,18 @@ const tokenExtractor = (req: Request, _res: Response, next: NextFunction) => {
   next();
 };
 
-const userExtractor = async (req: Request, res: Response, next: NextFunction) => {
+const userExtractor = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.token) {
     req.token = "";
   }
-  const decodedToken = jwt.verify(req.token, process.env.SECRET as string) as UserToken;
+  const decodedToken = jwt.verify(
+    req.token,
+    process.env.SECRET as string
+  ) as UserToken;
   if (!decodedToken.id) {
     res.status(401).json({ error: "token missing or invalid" });
   }
@@ -25,21 +32,27 @@ const userExtractor = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 const unknownEndpoint = (_req: Request, res: Response) => {
-  res.status(404).send({ error: "unknown endpoint" });
+  res.status(404).json({ error: "unknown endpoint" });
 };
 
-const errorHandler = (error: Error, _req: Request, res: Response, next: NextFunction) => {
-  logger.error(error.message);
-
+const errorHandler = (
+  error: Error,
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (error.name === "CastError") {
-    res.status(400).send({ error: "malformatted id" });
+    res.status(400).json({ error: "malformatted mongoose id" });
   } else if (error.name === "ValidationError") {
     res.status(400).json({ error: error.message });
   } else if (error.name === "JsonWebTokenError") {
     res.status(401).json({ error: "invalid token" });
+  } else if (error.name === "ParseError") {
+    res.status(400).json({ error: error.message });
+  } else {
+    logger.error(error.message);
+    next(error);
   }
-
-  next(error);
 };
 
 export default {

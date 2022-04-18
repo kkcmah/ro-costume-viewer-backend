@@ -1,27 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import bcrypt from "bcrypt";
-import express from "express";
-import User from "../models/user";
+import { Router } from "express";
+import { toUserLoginCreds } from "../utils/typeParsers/users";
+import usersService from "../services/usersService";
 
-const usersRouter = express.Router();
+const usersRouter = Router();
 // baseurl = api/user
 
 usersRouter.get("/", async (_req, res) => {
-  const users = await User.find({});
-  res.json(users);
+  res.json(await usersService.getAllUsers());
 });
 
 usersRouter.post("/", async (req, res) => {
-  const { username, password } = req.body;
-
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    return res.status(400).json({
-      error: "username must be unique",
-    });
-  }
+  const { username, password } = toUserLoginCreds(req.body);
 
   if (username.length < 3 || username.length > 50) {
     return res.status(400).json({
@@ -35,15 +25,15 @@ usersRouter.post("/", async (req, res) => {
     });
   }
 
-  const saltRounds = 10;
-  const passwordHash = await bcrypt.hash(password, saltRounds);
+  const existingUser = await usersService.getUserByUsername(username);
+  if (existingUser) {
+    return res.status(400).json({
+      error: "username must be unique",
+    });
+  }
 
-  const user = new User({
-    username,
-    passwordHash,
-  });
+  const savedUser = await usersService.addUser({ username, password });
 
-  const savedUser = await user.save();
   return res.status(201).json(savedUser);
 });
 

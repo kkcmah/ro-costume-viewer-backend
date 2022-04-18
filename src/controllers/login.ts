@@ -1,44 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import { Router } from "express";
-import User from "../models/user";
-import { UserToken } from "../types";
+import usersService from "../services/usersService";
+import { toUserLoginCreds } from "../utils/typeParsers/users";
 
 const loginRouter = Router();
 // baseurl = api/login
 
-loginRouter.get("/ping", async (_req, res) => {
-  const user = await User.findOne({});
-  console.log("poing", user);
-  res.json({ message: "pong" });
+loginRouter.get("/ping", (_req, res) => {
+  res.json({ message: "login pong" });
 });
 
-loginRouter.post("/", async (request, response) => {
-  const { username, password } = request.body;
+loginRouter.post("/", async (req, res) => {
+  const { username, password } = toUserLoginCreds(req.body);
 
-  const user = await User.findOne({ username });
-  const passwordCorrect =
-    user === null ? false : await bcrypt.compare(password, user.passwordHash);
-
-  if (!(user && passwordCorrect)) {
-    return response.status(401).json({
+  let token;
+  try {
+    token = await usersService.verifyUser({ username, password });
+  } catch (error) {
+    return res.status(401).json({
       error: "invalid username or password",
     });
   }
 
-  const userForToken: UserToken = {
-    username: user.username,
-    id: user._id.toString(),
-  };
-
-  const token = jwt.sign(userForToken, process.env.SECRET as string, {
-    expiresIn: "1d",
-  });
-
-  return response.status(200).send({ token, username: user.username });
+  return res.status(200).send({ token, username });
 });
 
 export default loginRouter;

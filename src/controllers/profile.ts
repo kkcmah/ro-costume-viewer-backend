@@ -5,7 +5,7 @@ const profileRouter = Router();
 // baseurl = api/profile
 
 profileRouter.get("/", (req, res) => {
-  res.json({ message: `you are recognized as: ${req.user}` });
+  res.json({ message: `you are recognized as: ${req.user?.username}` });
 });
 
 export default profileRouter;
