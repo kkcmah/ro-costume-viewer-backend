@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
+import { UserType } from "../types";
 
 export interface IUser {
   username: string;
   passwordHash: string;
+  favCostumes: mongoose.Types.ObjectId[];
+  userType: UserType;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -10,6 +13,13 @@ const userSchema = new mongoose.Schema<IUser>(
     username: { type: String, required: true, minlength: 3, maxlength: 50 },
     // do not test password restritions with mongoose validators because request pass !== db pass
     passwordHash: String,
+    favCostumes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Costume",
+      },
+    ],
+    userType: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
@@ -25,6 +35,7 @@ userSchema.set("toJSON", {
     delete returnedObject.__v;
     // the passwordHash should not be revealed
     delete returnedObject.passwordHash;
+    delete returnedObject.userType;
   },
 });
 

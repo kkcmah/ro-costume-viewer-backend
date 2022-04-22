@@ -7,6 +7,11 @@ declare module "express-serve-static-core" {
   }
 }
 
+export enum UserType {
+  Normal = 0,
+  Admin = 42,
+}
+
 export enum EquipSlot {
   Top = "Top",
   Middle = "Middle",

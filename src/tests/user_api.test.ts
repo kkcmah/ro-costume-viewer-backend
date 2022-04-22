@@ -2,15 +2,71 @@
 import mongoose from "mongoose";
 import supertest from "supertest";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import app from "../app";
 import User from "../models/user";
 import helper from "./test_helper";
+import { UserToken, UserType } from "../types";
 
 const api = supertest(app);
 
+// GET /api/users
+describe("accessing full list of users", () => {
+  let normalUserToken: string;
+  let adminUserToken: string;
+  beforeEach(async () => {
+    await api.post("/api/testing/resetUsers");
+    const passwordHash = await bcrypt.hash("secretpass", 3);
+    const normalUser = new User({ username: "normal", passwordHash });
+    await normalUser.save();
+    const normalUserForToken: UserToken = {
+      username: normalUser.username,
+      id: normalUser._id.toString(),
+    };
+    normalUserToken = jwt.sign(
+      normalUserForToken,
+      process.env.SECRET as string,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    const adminUser = new User({
+      username: "admin",
+      passwordHash,
+      userType: UserType.Admin,
+    });
+    await adminUser.save();
+    const adminUserForToken: UserToken = {
+      username: adminUser.username,
+      id: adminUser._id.toString(),
+    };
+    adminUserToken = jwt.sign(adminUserForToken, process.env.SECRET as string, {
+      expiresIn: "1d",
+    });
+  });
+
+  test("as normal user fails with 401", async () => {
+    await api
+      .get("/api/users")
+      .set("Authorization", `bearer ${normalUserToken}`)
+      .expect(401);
+  });
+
+  test("as admin user succeeds", async () => {
+    console.log("here", adminUserToken);
+    await api
+      .get("/api/users")
+      .set("Authorization", `bearer ${adminUserToken}`)
+      .expect(200)
+      .expect("content-type", /application\/json/);
+  });
+});
+
+// POST /api/users
 describe("when there is initially one user in db", () => {
   beforeEach(async () => {
-    await User.deleteMany({});
+    await api.post("/api/testing/resetUsers");
     const passwordHash = await bcrypt.hash("secretpass", 10);
     const user = new User({ username: "root", passwordHash });
 
@@ -61,7 +117,7 @@ describe("when there is initially one user in db", () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
-      username: "",
+      username: "a",
       password: "mypassword",
     };
 
@@ -84,7 +140,7 @@ describe("when there is initially one user in db", () => {
 
     const newUser = {
       username: "new username",
-      password: "",
+      password: "a",
     };
 
     const result = await api

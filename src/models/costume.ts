@@ -6,13 +6,12 @@ export interface ICostume {
   name: string;
   equipSlots: EquipSlot[];
   costumeTags: mongoose.Types.ObjectId[];
-  gifUrl: string;
-  iconUrl: string;
+  previewUrl: string;
+  className: string;
 }
 
 const costumeSchema = new mongoose.Schema<ICostume>({
   itemId: { type: Number, required: true },
-  // do not test password restritions with mongoose validators because request pass !== db pass
   name: { type: String, required: true },
   equipSlots: { type: [String] },
   costumeTags: [
@@ -21,8 +20,8 @@ const costumeSchema = new mongoose.Schema<ICostume>({
       ref: "CostumeTag",
     },
   ],
-  gifUrl: String,
-  iconUrl: String,
+  previewUrl: String,
+  className: String,
 });
 
 const Costume = mongoose.model<ICostume>("Costume", costumeSchema);

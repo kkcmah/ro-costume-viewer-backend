@@ -2,14 +2,21 @@
 import { Router } from "express";
 import { toUserLoginCreds } from "../utils/typeParsers/users";
 import usersService from "../services/usersService";
+import middleware from "../utils/middleware";
 
 const usersRouter = Router();
-// baseurl = api/user
+// baseurl = api/users
 
-usersRouter.get("/", async (_req, res) => {
-  res.json(await usersService.getAllUsers());
-});
+usersRouter.get(
+  "/",
+  middleware.userExtractor,
+  middleware.isUserAdmin,
+  async (_req, res) => {
+    res.json(await usersService.getAllUsers());
+  }
+);
 
+// sign up
 usersRouter.post("/", async (req, res) => {
   const { username, password } = toUserLoginCreds(req.body);
 

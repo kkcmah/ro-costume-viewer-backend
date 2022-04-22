@@ -2,7 +2,7 @@ import logger from "./logger";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
 import { Request, Response, NextFunction } from "express";
-import { UserToken } from "../types";
+import { UserToken, UserType } from "../types";
 
 const tokenExtractor = (req: Request, _res: Response, next: NextFunction) => {
   const authorization = req.get("authorization");
@@ -31,6 +31,14 @@ const userExtractor = async (
   next();
 };
 
+const isUserAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user || req.user.userType !== UserType.Admin) {
+    res.status(401).json({ error: "you do not have sufficient permissions" });
+  } else {
+    next();
+  }
+};
+
 const unknownEndpoint = (_req: Request, res: Response) => {
   res.status(404).json({ error: "unknown endpoint" });
 };
@@ -47,6 +55,8 @@ const errorHandler = (
     res.status(400).json({ error: error.message });
   } else if (error.name === "JsonWebTokenError") {
     res.status(401).json({ error: "invalid token" });
+  } else if (error.name === "TokenExpiredError") {
+    res.status(401).json({ error: "session expired: please log out and relogin" });
   } else if (error.name === "ParseError") {
     res.status(400).json({ error: error.message });
   } else {
@@ -60,4 +70,5 @@ export default {
   userExtractor,
   unknownEndpoint,
   errorHandler,
+  isUserAdmin,
 };
