@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 interface ICostumeSet {
+  id?: mongoose.Types.ObjectId;
   name: string;
   description: string;
   costumes: mongoose.Types.ObjectId[];

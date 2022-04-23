@@ -16,6 +16,10 @@ export const isDate = (date: string): boolean => {
   return Boolean(Date.parse(date));
 };
 
+export const isNumber = (param: unknown): param is number => {
+  return typeof param === "number" && !isNaN(param);
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isEquipSlot = (param: any): param is EquipSlot => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

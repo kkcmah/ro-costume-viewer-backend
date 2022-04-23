@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
-interface ICostumeTag {
+export interface ICostumeTag {
+  id?: mongoose.Types.ObjectId;
   name: string;
 }
 

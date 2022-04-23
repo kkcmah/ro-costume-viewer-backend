@@ -1,6 +1,6 @@
 import logger from "./logger";
 import jwt from "jsonwebtoken";
-import User from "../models/user";
+import usersService from "../services/usersService";
 import { Request, Response, NextFunction } from "express";
 import { UserToken, UserType } from "../types";
 
@@ -27,7 +27,7 @@ const userExtractor = async (
   if (!decodedToken.id) {
     res.status(401).json({ error: "token missing or invalid" });
   }
-  req.user = await User.findById(decodedToken.id);
+  req.user = await usersService.getUserById(decodedToken.id);
   next();
 };
 
@@ -56,7 +56,9 @@ const errorHandler = (
   } else if (error.name === "JsonWebTokenError") {
     res.status(401).json({ error: "invalid token" });
   } else if (error.name === "TokenExpiredError") {
-    res.status(401).json({ error: "session expired: please log out and relogin" });
+    res
+      .status(401)
+      .json({ error: "session expired: please log out and relogin" });
   } else if (error.name === "ParseError") {
     res.status(400).json({ error: error.message });
   } else {

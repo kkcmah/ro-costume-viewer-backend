@@ -17,10 +17,10 @@ const parsePassword = (name: unknown): string => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const toUserLoginCreds = (object: any): UserLoginCreds => {
-  const newPatient: UserLoginCreds = {
+  const newUser: UserLoginCreds = {
     username: parseUsername(object.username),
     password: parsePassword(object.password),
   };
 
-  return newPatient;
+  return newUser;
 };

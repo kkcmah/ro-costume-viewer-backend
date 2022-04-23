@@ -8,6 +8,14 @@ const getAllUsers = async (): Promise<IUser[]> => {
   return users;
 };
 
+const getUserById = async (id: string): Promise<IUser | undefined> => {
+  const user = await User.findById(id);
+  if (!user) {
+    return undefined;
+  }
+  return user;
+};
+
 const getUserByUsername = async (
   username: string
 ): Promise<IUser | undefined> => {
@@ -50,4 +58,17 @@ const verifyUser = async ({
   return token;
 };
 
-export default { getAllUsers, getUserByUsername, addUser, verifyUser };
+const favoriteCostume = async (user: IUser, costumeId: string) => {
+  return await User.findByIdAndUpdate(user.id, {
+    $addToSet: { favCostumes: costumeId },
+  });
+};
+
+export default {
+  getAllUsers,
+  getUserById,
+  getUserByUsername,
+  addUser,
+  verifyUser,
+  favoriteCostume,
+};

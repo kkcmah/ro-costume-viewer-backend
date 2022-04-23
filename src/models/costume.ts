@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { EquipSlot } from "../types";
 
 export interface ICostume {
+  id?: mongoose.Types.ObjectId;
   itemId: number;
   name: string;
   equipSlots: EquipSlot[];

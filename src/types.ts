@@ -1,3 +1,4 @@
+import { ICostume } from "./models/costume";
 import { IUser } from "./models/user";
 
 declare module "express-serve-static-core" {
@@ -28,3 +29,5 @@ export interface UserLoginCreds {
   username: string;
   password: string;
 }
+
+export type NewCostume = Omit<ICostume, "id">;

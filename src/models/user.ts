@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { UserType } from "../types";
 
 export interface IUser {
+  id?: mongoose.Types.ObjectId;
   username: string;
   passwordHash: string;
   favCostumes: mongoose.Types.ObjectId[];
