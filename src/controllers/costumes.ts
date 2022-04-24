@@ -38,7 +38,7 @@ costumesRouter.post("/favorite", middleware.userExtractor, async (req, res) => {
   const costumeId = toCostumeId(req.body);
 
   const isCostumeAlreadyFavorited =
-    req.user.favCostumes.findIndex((lcs) => lcs.toString() === costumeId) !==
+    req.user.favCostumes.findIndex((cos) => cos.toString() === costumeId) !==
     -1;
 
   if (isCostumeAlreadyFavorited) {
@@ -66,7 +66,7 @@ costumesRouter.post(
     const costumeId = toCostumeId(req.body);
 
     const isCostumeAlreadyUnfavorited =
-      req.user.favCostumes.findIndex((lcs) => lcs.toString() === costumeId) ===
+      req.user.favCostumes.findIndex((cos) => cos.toString() === costumeId) ===
       -1;
 
     if (isCostumeAlreadyUnfavorited) {
