@@ -36,6 +36,14 @@ costumesRouter.post("/favorite", middleware.userExtractor, async (req, res) => {
       .json({ error: "you must be logged in to favorite a costume" });
   }
   const costumeId = toCostumeId(req.body);
+
+  const isCostumeAlreadyFavorited =
+    req.user.favCostumes.findIndex((lcs) => lcs.toString() === costumeId) !==
+    -1;
+
+  if (isCostumeAlreadyFavorited) {
+    return res.status(200).json(req.user.favCostumes);
+  }
   const updatedUser = await usersService.favoriteCostume(req.user, costumeId);
   if (!updatedUser) {
     return res
@@ -56,6 +64,15 @@ costumesRouter.post(
         .json({ error: "you must be logged in to unfavorite a costume" });
     }
     const costumeId = toCostumeId(req.body);
+
+    const isCostumeAlreadyUnfavorited =
+      req.user.favCostumes.findIndex((lcs) => lcs.toString() === costumeId) ===
+      -1;
+
+    if (isCostumeAlreadyUnfavorited) {
+      return res.status(200).json(req.user.favCostumes);
+    }
+
     const updatedUser = await usersService.unFavoriteCostume(
       req.user,
       costumeId
@@ -69,6 +86,7 @@ costumesRouter.post(
   }
 );
 
+// create a costume set
 costumesRouter.post(
   "/costumeSet",
   middleware.userExtractor,
@@ -86,6 +104,7 @@ costumesRouter.post(
   }
 );
 
+// delete a costume set if user is owner
 costumesRouter.delete(
   "/costumeSet",
   middleware.userExtractor,
@@ -116,6 +135,72 @@ costumesRouter.delete(
         .status(401)
         .json({ error: "You are not the owner of this costume set" });
     }
+  }
+);
+
+// like a costume set
+costumesRouter.post(
+  "/costumeSet/:id/like",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user) {
+      return res
+        .status(400)
+        .json({ error: "you must be logged in to like a costume set" });
+    }
+
+    const costumeSetId = req.params.id;
+    const isSetAlreadyLiked =
+      req.user.likedCostumeSets.findIndex(
+        (lcs) => lcs.toString() === costumeSetId
+      ) !== -1;
+
+    if (isSetAlreadyLiked) {
+      return res.status(200).json(req.user.likedCostumeSets);
+    }
+
+    const updatedUser = await usersService.likeCostumeSet(
+      req.user,
+      costumeSetId
+    );
+    if (!updatedUser) {
+      return res.status(400).json({ error: "failed to like costume set" });
+    }
+    await costumesService.likeCostumeSet(costumeSetId);
+    return res.json(updatedUser.likedCostumeSets);
+  }
+);
+
+// unlike a costume set
+costumesRouter.post(
+  "/costumeSet/:id/unlike",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user) {
+      return res
+        .status(400)
+        .json({ error: "you must be logged in to unlike a costume set" });
+    }
+
+    const costumeSetId = req.params.id;
+    const isSetAlreadyUnliked =
+      req.user.likedCostumeSets.findIndex(
+        (lcs) => lcs.toString() === costumeSetId
+      ) === -1;
+
+    if (isSetAlreadyUnliked) {
+      return res.status(200).json(req.user.likedCostumeSets);
+    }
+
+    const updatedUser = await usersService.unlikeCostumeSet(
+      req.user,
+      costumeSetId
+    );
+    if (!updatedUser) {
+      return res.status(400).json({ error: "failed to unlike costume set" });
+    }
+    await costumesService.unlikeCostumeSet(costumeSetId);
+    return res.json(updatedUser.likedCostumeSets);
   }
 );
 

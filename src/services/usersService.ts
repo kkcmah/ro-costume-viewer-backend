@@ -78,6 +78,26 @@ const unFavoriteCostume = async (user: IUser, costumeId: string) => {
   );
 };
 
+const likeCostumeSet = async (user: IUser, costumeSetId: string) => {
+  return await User.findByIdAndUpdate(
+    user.id,
+    {
+      $addToSet: { likedCostumeSets: costumeSetId },
+    },
+    { new: true }
+  );
+};
+
+const unlikeCostumeSet = async (user: IUser, costumeSetId: string) => {
+  return await User.findByIdAndUpdate(
+    user.id,
+    {
+      $pull: { likedCostumeSets: costumeSetId },
+    },
+    { new: true }
+  );
+};
+
 export default {
   getAllUsers,
   getUserById,
@@ -85,5 +105,7 @@ export default {
   addUser,
   verifyUser,
   favoriteCostume,
-  unFavoriteCostume
+  unFavoriteCostume,
+  likeCostumeSet,
+  unlikeCostumeSet
 };

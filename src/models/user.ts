@@ -6,6 +6,7 @@ export interface IUser {
   username: string;
   passwordHash: string;
   favCostumes: mongoose.Types.ObjectId[];
+  likedCostumeSets: mongoose.Types.ObjectId[];
   userType: UserType;
 }
 
@@ -18,6 +19,12 @@ const userSchema = new mongoose.Schema<IUser>(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Costume",
+      },
+    ],
+    likedCostumeSets: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CostumeSet",
       },
     ],
     userType: { type: Number, default: 0 },

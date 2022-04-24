@@ -54,7 +54,7 @@ const addCostume = async ({
     previewUrl,
     className,
   });
-  const addedCostume = costumeToAdd.save();
+  const addedCostume = await costumeToAdd.save();
   return addedCostume;
 };
 
@@ -74,12 +74,32 @@ const addCostumeSet = async ({
     owner,
     isPublic,
   });
-  const addedCostumeSet = costumeSetToAdd.save();
+  const addedCostumeSet = await costumeSetToAdd.save();
   return addedCostumeSet;
 };
 
 const deleteCostumeSet = async (id: string) => {
   return await CostumeSet.findByIdAndDelete(id);
+};
+
+const likeCostumeSet = async (id: string) => {
+  return await CostumeSet.findByIdAndUpdate(
+    id,
+    {
+      $inc: { likes: 1 },
+    },
+    { new: true }
+  );
+};
+
+const unlikeCostumeSet = async (id: string) => {
+  return await CostumeSet.findByIdAndUpdate(
+    id,
+    {
+      $inc: { likes: -1 },
+    },
+    { new: true }
+  );
 };
 
 export default {
@@ -91,4 +111,6 @@ export default {
   getCostumesByIds,
   addCostumeSet,
   deleteCostumeSet,
+  likeCostumeSet,
+  unlikeCostumeSet,
 };
