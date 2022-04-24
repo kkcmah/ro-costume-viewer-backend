@@ -2,46 +2,55 @@ import Costume, { ICostume } from "../models/costume";
 import User from "../models/user";
 import { EquipSlot } from "../types";
 
+const oneCostume: ICostume = {
+  itemId: 124,
+  name: "poring hat",
+  equipSlots: [EquipSlot.Top],
+  costumeTags: [],
+  previewUrl: "",
+  className: "",
+};
+
 const initialCostumes: ICostume[] = [
   {
     itemId: 12,
     name: "poring hat",
     equipSlots: [EquipSlot.Top],
     costumeTags: [],
-    gifUrl: "",
-    iconUrl: "",
+    previewUrl: "",
+    className: "",
   },
   {
     itemId: 125,
     name: "poring glasses",
     equipSlots: [EquipSlot.Middle],
     costumeTags: [],
-    gifUrl: "",
-    iconUrl: "",
+    previewUrl: "",
+    className: "",
   },
   {
     itemId: 5125,
     name: "poring bread",
     equipSlots: [EquipSlot.Lower],
     costumeTags: [],
-    gifUrl: "",
-    iconUrl: "",
+    previewUrl: "",
+    className: "",
   },
   {
     itemId: 62363,
     name: "poring aura garment",
     equipSlots: [EquipSlot.Garment],
     costumeTags: [],
-    gifUrl: "",
-    iconUrl: "",
+    previewUrl: "",
+    className: "",
   },
   {
     itemId: 2165,
     name: "poring mask",
     equipSlots: [EquipSlot.Top, EquipSlot.Middle],
     costumeTags: [],
-    gifUrl: "",
-    iconUrl: "",
+    previewUrl: "",
+    className: "",
   },
 ];
 
@@ -67,6 +76,7 @@ const usersInDb = async () => {
 };
 
 export default {
+  oneCostume,
   initialCostumes,
   nonExistingId,
   costumesInDb,

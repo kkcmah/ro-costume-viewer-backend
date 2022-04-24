@@ -41,4 +41,28 @@ costumesRouter.post("/favorite", middleware.userExtractor, async (req, res) => {
   return res.json(updatedUser.favCostumes);
 });
 
+// remove costume from user's favorite
+costumesRouter.post(
+  "/unfavorite",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user) {
+      return res
+        .status(400)
+        .json({ error: "you must be logged in to unfavorite a costume" });
+    }
+    const costumeId = toCostumeId(req.body);
+    const updatedUser = await usersService.unFavoriteCostume(
+      req.user,
+      costumeId
+    );
+    if (!updatedUser) {
+      return res
+        .status(400)
+        .json({ error: "failed to remove costume from favorites" });
+    }
+    return res.json(updatedUser.favCostumes);
+  }
+);
+
 export default costumesRouter;

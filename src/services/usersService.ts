@@ -59,9 +59,23 @@ const verifyUser = async ({
 };
 
 const favoriteCostume = async (user: IUser, costumeId: string) => {
-  return await User.findByIdAndUpdate(user.id, {
-    $addToSet: { favCostumes: costumeId },
-  });
+  return await User.findByIdAndUpdate(
+    user.id,
+    {
+      $addToSet: { favCostumes: costumeId },
+    },
+    { new: true }
+  );
+};
+
+const unFavoriteCostume = async (user: IUser, costumeId: string) => {
+  return await User.findByIdAndUpdate(
+    user.id,
+    {
+      $pull: { favCostumes: costumeId },
+    },
+    { new: true }
+  );
 };
 
 export default {
@@ -71,4 +85,5 @@ export default {
   addUser,
   verifyUser,
   favoriteCostume,
+  unFavoriteCostume
 };

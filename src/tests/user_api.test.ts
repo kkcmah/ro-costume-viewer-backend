@@ -14,7 +14,7 @@ const api = supertest(app);
 describe("accessing full list of users", () => {
   let normalUserToken: string;
   let adminUserToken: string;
-  beforeEach(async () => {
+  beforeAll(async () => {
     await api.post("/api/testing/resetUsers");
     const passwordHash = await bcrypt.hash("secretpass", 3);
     const normalUser = new User({ username: "normal", passwordHash });
@@ -54,7 +54,6 @@ describe("accessing full list of users", () => {
   });
 
   test("as admin user succeeds", async () => {
-    console.log("here", adminUserToken);
     await api
       .get("/api/users")
       .set("Authorization", `bearer ${adminUserToken}`)
