@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import mongoose from "mongoose";
 import supertest from "supertest";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import app from "../app";
-import User from "../models/user";
 import helper from "./test_helper";
-import { UserToken, UserType } from "../types";
 
 const api = supertest(app);
 
@@ -16,34 +12,8 @@ describe("accessing full list of users", () => {
   let adminUserToken: string;
   beforeAll(async () => {
     await api.post("/api/testing/resetUsers");
-    const passwordHash = await bcrypt.hash("secretpass", 3);
-    const normalUser = new User({ username: "normal", passwordHash });
-    await normalUser.save();
-    const normalUserForToken: UserToken = {
-      username: normalUser.username,
-      id: normalUser._id.toString(),
-    };
-    normalUserToken = jwt.sign(
-      normalUserForToken,
-      process.env.SECRET as string,
-      {
-        expiresIn: "1d",
-      }
-    );
-
-    const adminUser = new User({
-      username: "admin",
-      passwordHash,
-      userType: UserType.Admin,
-    });
-    await adminUser.save();
-    const adminUserForToken: UserToken = {
-      username: adminUser.username,
-      id: adminUser._id.toString(),
-    };
-    adminUserToken = jwt.sign(adminUserForToken, process.env.SECRET as string, {
-      expiresIn: "1d",
-    });
+    normalUserToken = await helper.createNormalUserToken();
+    adminUserToken = await helper.createAdminUserToken();
   });
 
   test("as normal user fails with 401", async () => {
@@ -66,10 +36,7 @@ describe("accessing full list of users", () => {
 describe("when there is initially one user in db", () => {
   beforeEach(async () => {
     await api.post("/api/testing/resetUsers");
-    const passwordHash = await bcrypt.hash("secretpass", 10);
-    const user = new User({ username: "root", passwordHash });
-
-    await user.save();
+    await helper.createNormalUserToken();
   });
 
   test("adding new username succeeds", async () => {
@@ -97,7 +64,7 @@ describe("when there is initially one user in db", () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
-      username: "root",
+      username: usersAtStart[0].username,
       password: "new password",
     };
 

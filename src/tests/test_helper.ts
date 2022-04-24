@@ -1,6 +1,8 @@
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import Costume, { ICostume } from "../models/costume";
 import User from "../models/user";
-import { EquipSlot } from "../types";
+import { EquipSlot, UserToken, UserType } from "../types";
 
 const oneCostume: ICostume = {
   itemId: 124,
@@ -54,7 +56,7 @@ const initialCostumes: ICostume[] = [
   },
 ];
 
-const nonExistingId = async () => {
+const nonExistingCostumeId = async () => {
   const costume = new Costume({
     itemId: 123,
     name: "willberemoved",
@@ -63,6 +65,36 @@ const nonExistingId = async () => {
   await costume.remove();
 
   return costume._id.toString();
+};
+
+const createNormalUserToken = async () => {
+  const passwordHash = await bcrypt.hash("secretpass", 3);
+  const normalUser = new User({ username: "normal", passwordHash });
+  await normalUser.save();
+  const normalUserForToken: UserToken = {
+    username: normalUser.username,
+    id: normalUser._id.toString(),
+  };
+  return jwt.sign(normalUserForToken, process.env.SECRET as string, {
+    expiresIn: "1d",
+  });
+};
+
+const createAdminUserToken = async () => {
+  const passwordHash = await bcrypt.hash("secretpass", 3);
+  const normalUser = new User({
+    username: "normal",
+    passwordHash,
+    userType: UserType.Admin,
+  });
+  await normalUser.save();
+  const normalUserForToken: UserToken = {
+    username: normalUser.username,
+    id: normalUser._id.toString(),
+  };
+  return jwt.sign(normalUserForToken, process.env.SECRET as string, {
+    expiresIn: "1d",
+  });
 };
 
 const costumesInDb = async () => {
@@ -78,7 +110,9 @@ const usersInDb = async () => {
 export default {
   oneCostume,
   initialCostumes,
-  nonExistingId,
+  nonExistingCostumeId,
+  createNormalUserToken,
+  createAdminUserToken,
   costumesInDb,
   usersInDb,
 };

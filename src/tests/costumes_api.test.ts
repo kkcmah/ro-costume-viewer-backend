@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import mongoose from "mongoose";
 import supertest from "supertest";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import app from "../app";
-import User from "../models/user";
 import helper from "./test_helper";
-import { UserToken } from "../types";
 import Costume from "../models/costume";
 
 const api = supertest(app);
@@ -18,16 +14,7 @@ describe("when there's a user and costume in db", () => {
   beforeEach(async () => {
     await api.post("/api/testing/resetUsers");
     await api.post("/api/testing/resetCostumes");
-    const passwordHash = await bcrypt.hash("secretpass", 3);
-    const user = new User({ username: "rootcostume", passwordHash });
-    await user.save();
-    const userForToken: UserToken = {
-      username: user.username,
-      id: user._id.toString(),
-    };
-    existingUserToken = jwt.sign(userForToken, process.env.SECRET as string, {
-      expiresIn: "1d",
-    });
+    existingUserToken = await helper.createNormalUserToken();
 
     // setup a initial costume
     const existingCostume = new Costume(helper.oneCostume);
