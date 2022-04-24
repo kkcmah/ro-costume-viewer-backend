@@ -25,3 +25,7 @@ export const isEquipSlot = (param: any): param is EquipSlot => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return Object.values(EquipSlot).includes(param);
 };
+
+export const isBoolean = (param: unknown): param is boolean => {
+  return typeof param === "boolean";
+};

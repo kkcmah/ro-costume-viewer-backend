@@ -4,6 +4,10 @@ import costumesService from "../services/costumesService";
 import usersService from "../services/usersService";
 import middleware from "../utils/middleware";
 import { toCostumeId, toNewCostume } from "../utils/typeParsers/costumes";
+import {
+  toCostumeSetId,
+  toNewCostumeSet,
+} from "../utils/typeParsers/costumeSet";
 
 const costumesRouter = Router();
 // baseurl = api/costumes
@@ -62,6 +66,56 @@ costumesRouter.post(
         .json({ error: "failed to remove costume from favorites" });
     }
     return res.json(updatedUser.favCostumes);
+  }
+);
+
+costumesRouter.post(
+  "/costumeSet",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(400)
+        .json({ error: "You must be logged in to create a costume set" });
+    }
+    const costumeSetToAdd = await toNewCostumeSet(req.body, req.user.id);
+    const addedCostumeSet = await costumesService.addCostumeSet(
+      costumeSetToAdd
+    );
+    return res.json(addedCostumeSet);
+  }
+);
+
+costumesRouter.delete(
+  "/costumeSet",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(400)
+        .json({ error: "You must be logged in to delete a costume set" });
+    }
+    const costumeSetIdToDelete = toCostumeSetId(req.body);
+    const costumeSetToDel = await costumesService.getCostumeSetById(
+      costumeSetIdToDelete
+    );
+
+    if (!costumeSetToDel) {
+      return res.status(200).json({ message: "costume set already deleted" });
+    }
+
+    if (costumeSetToDel.owner.toString() === req.user.id.toString()) {
+      const deletedCostumeSet = await costumesService.deleteCostumeSet(
+        costumeSetIdToDelete
+      );
+      return res
+        .status(200)
+        .json({ message: `deleted set name: ${deletedCostumeSet?.name}` });
+    } else {
+      return res
+        .status(401)
+        .json({ error: "You are not the owner of this costume set" });
+    }
   }
 );
 

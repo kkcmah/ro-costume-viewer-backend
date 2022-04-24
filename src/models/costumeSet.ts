@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 
-interface ICostumeSet {
+export interface ICostumeSet {
   id?: mongoose.Types.ObjectId;
   name: string;
   description: string;
   costumes: mongoose.Types.ObjectId[];
   likes: number;
   owner: mongoose.Types.ObjectId;
-  public: boolean;
+  isPublic: boolean;
 }
 
 const costumeSetSchema = new mongoose.Schema<ICostumeSet>(
   {
-    name: { type: String, required: true, minlength: 1 },
+    name: { type: String, required: true, minlength: 1, maxlength: 100 },
     description: { type: String, maxlength: 300 },
     costumes: [
       {
@@ -26,7 +26,7 @@ const costumeSetSchema = new mongoose.Schema<ICostumeSet>(
       required: true,
       ref: "User",
     },
-    public: { type: Boolean, default: false },
+    isPublic: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

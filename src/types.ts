@@ -1,4 +1,6 @@
 import { ICostume } from "./models/costume";
+import { ICostumeSet } from "./models/costumeSet";
+import { ICostumeTag } from "./models/costumeTag";
 import { IUser } from "./models/user";
 
 declare module "express-serve-static-core" {
@@ -31,3 +33,5 @@ export interface UserLoginCreds {
 }
 
 export type NewCostume = Omit<ICostume, "id">;
+export type NewCostumeSet = Omit<ICostumeSet, "id">;
+export type NewCostumeTag = Omit<ICostumeTag, "id">;
