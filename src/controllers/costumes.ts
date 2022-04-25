@@ -6,6 +6,7 @@ import middleware from "../utils/middleware";
 import { toCostumeId, toNewCostume } from "../utils/typeParsers/costumes";
 import {
   toCostumeSetId,
+  toCostumeSetUpdatableFields,
   toNewCostumeSet,
 } from "../utils/typeParsers/costumeSet";
 
@@ -14,7 +15,7 @@ const costumesRouter = Router();
 
 costumesRouter.get("/", async (_req, res) => {
   const costumes = await costumesService.getAllCostumes();
-  res.json(costumes);
+  res.status(200).json(costumes);
 });
 
 costumesRouter.post(
@@ -24,7 +25,7 @@ costumesRouter.post(
   async (req, res) => {
     const costumeToAdd = await toNewCostume(req.body);
     const addedCostume = await costumesService.addCostume(costumeToAdd);
-    res.json(addedCostume);
+    res.status(201).json(addedCostume);
   }
 );
 
@@ -50,7 +51,7 @@ costumesRouter.post("/favorite", middleware.userExtractor, async (req, res) => {
       .status(400)
       .json({ error: "failed to add costume to favorites" });
   }
-  return res.json(updatedUser.favCostumes);
+  return res.status(200).json(updatedUser.favCostumes);
 });
 
 // remove costume from user's favorite
@@ -82,7 +83,7 @@ costumesRouter.post(
         .status(400)
         .json({ error: "failed to remove costume from favorites" });
     }
-    return res.json(updatedUser.favCostumes);
+    return res.status(200).json(updatedUser.favCostumes);
   }
 );
 
@@ -100,7 +101,7 @@ costumesRouter.post(
     const addedCostumeSet = await costumesService.addCostumeSet(
       costumeSetToAdd
     );
-    return res.json(addedCostumeSet);
+    return res.status(201).json(addedCostumeSet);
   }
 );
 
@@ -167,7 +168,7 @@ costumesRouter.post(
       return res.status(400).json({ error: "failed to like costume set" });
     }
     await costumesService.likeCostumeSet(costumeSetId);
-    return res.json(updatedUser.likedCostumeSets);
+    return res.status(200).json(updatedUser.likedCostumeSets);
   }
 );
 
@@ -200,7 +201,42 @@ costumesRouter.post(
       return res.status(400).json({ error: "failed to unlike costume set" });
     }
     await costumesService.unlikeCostumeSet(costumeSetId);
-    return res.json(updatedUser.likedCostumeSets);
+    return res.status(200).json(updatedUser.likedCostumeSets);
+  }
+);
+
+// update a costume set
+costumesRouter.patch(
+  "/costumeSet/:id",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(400)
+        .json({ error: "You must be logged in to update a costume set" });
+    }
+
+    const costumeSetToUpdate = await costumesService.getCostumeSetById(
+      req.params.id
+    );
+    if (
+      !costumeSetToUpdate ||
+      costumeSetToUpdate.owner.toString() !== req.user.id.toString()
+    ) {
+      return res.status(401).json({
+        error: "You do not have permissions to update this costume set",
+      });
+    }
+
+    const updatedCostumeSetFields = await toCostumeSetUpdatableFields(req.body);
+    const updatedCostumeSet = await costumesService.updateCostumeSet(
+      req.params.id,
+      updatedCostumeSetFields
+    );
+    if (!updatedCostumeSet) {
+      return res.status(400).json({ error: "failed to update costume set" });
+    }
+    return res.status(200).json(updatedCostumeSet);
   }
 );
 

@@ -61,6 +61,8 @@ const errorHandler = (
       .json({ error: "session expired: please log out and relogin" });
   } else if (error.name === "ParseError") {
     res.status(400).json({ error: error.message });
+  } else if (error.name === "SyntaxError") {
+    res.status(400).json({ error: error.message });
   } else {
     logger.error(error.message);
     next(error);

@@ -35,3 +35,5 @@ export interface UserLoginCreds {
 export type NewCostume = Omit<ICostume, "id">;
 export type NewCostumeSet = Omit<ICostumeSet, "id">;
 export type NewCostumeTag = Omit<ICostumeTag, "id">;
+
+export type CostumeSetUpdatableFields = Omit<NewCostumeSet, "likes" | "owner">;

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import costumesService from "../../services/costumesService";
-import { NewCostumeSet } from "../../types";
+import { CostumeSetUpdatableFields, NewCostumeSet } from "../../types";
 import { isBoolean, isString, ParseError } from "./helpers";
 
 const parseName = (name: unknown): string => {
@@ -91,4 +91,17 @@ export const toNewCostumeSet = async (
     isPublic: parseIsPublic(object.isPublic),
   };
   return newCostumeSet;
+};
+
+export const toCostumeSetUpdatableFields = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  object: any
+): Promise<CostumeSetUpdatableFields> => {
+  const updatedCostumeSetFields: CostumeSetUpdatableFields = {
+    name: parseName(object.name),
+    description: parseDescription(object.description),
+    costumes: await parseCostumes(object.costumes),
+    isPublic: parseIsPublic(object.isPublic),
+  };
+  return updatedCostumeSetFields;
 };

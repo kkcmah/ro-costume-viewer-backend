@@ -1,7 +1,7 @@
 import Costume, { ICostume } from "../models/costume";
 import CostumeSet, { ICostumeSet } from "../models/costumeSet";
 import CostumeTag, { ICostumeTag } from "../models/costumeTag";
-import { NewCostume, NewCostumeSet } from "../types";
+import { CostumeSetUpdatableFields, NewCostume, NewCostumeSet } from "../types";
 
 const getAllCostumes = async (): Promise<ICostume[]> => {
   const costumes = await Costume.find({});
@@ -102,6 +102,17 @@ const unlikeCostumeSet = async (id: string) => {
   );
 };
 
+const updateCostumeSet = async (
+  id: string,
+  updatableFields: CostumeSetUpdatableFields
+): Promise<ICostumeSet | null> => {
+  return await CostumeSet.findByIdAndUpdate(
+    id,
+    { ...updatableFields },
+    { new: true }
+  );
+};
+
 export default {
   getAllCostumes,
   getCostumeById,
@@ -113,4 +124,5 @@ export default {
   deleteCostumeSet,
   likeCostumeSet,
   unlikeCostumeSet,
+  updateCostumeSet,
 };
