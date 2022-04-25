@@ -8,21 +8,15 @@ const getAllUsers = async (): Promise<IUser[]> => {
   return users;
 };
 
-const getUserById = async (id: string): Promise<IUser | undefined> => {
+const getUserById = async (id: string): Promise<IUser | null> => {
   const user = await User.findById(id);
-  if (!user) {
-    return undefined;
-  }
   return user;
 };
 
 const getUserByUsername = async (
   username: string
-): Promise<IUser | undefined> => {
+): Promise<IUser | null> => {
   const existingUser = await User.findOne({ username });
-  if (!existingUser) {
-    return undefined;
-  }
   return existingUser;
 };
 

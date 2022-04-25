@@ -49,17 +49,26 @@ const parseCostumeTags = async (
   if (!costumeTags || !Array.isArray(costumeTags)) {
     throw new ParseError("Malformatted or missing costumeTags " + costumeTags);
   }
-  const dbCostumeTags = await costumeTagsService.getAllCostumeTags();
 
-  return costumeTags.map((tag) => {
-    if (!tag || !isString(tag)) {
-      throw new ParseError("Malformatted or missing costumeTag " + tag);
+  const costumeTagIds = costumeTags.map((cos) => {
+    if (!cos || !isString(cos)) {
+      throw new ParseError("Malformatted or missing costumeTag id " + cos);
     }
-    const foundDbTag = dbCostumeTags.find((dbtag) => dbtag.name === tag);
-    if (!foundDbTag || !foundDbTag.id) {
-      throw new ParseError("Malformatted or missing costumeTag " + tag);
+    return cos;
+  });
+
+  const costumeTagsInDb = await costumeTagsService.getCostumeTagsByIds(
+    costumeTagIds
+  );
+
+  if (costumeTagsInDb.length !== costumeTags.length) {
+    throw new ParseError("One or more costumeTag(s) do not exist");
+  }
+  return costumeTagsInDb.map((cos) => {
+    if (!cos || !cos.id) {
+      throw new ParseError("Malformatted or missing costumeTag id " + cos.name);
     }
-    return foundDbTag.id;
+    return cos.id;
   });
 };
 

@@ -6,11 +6,8 @@ const getAllCostumes = async (): Promise<ICostume[]> => {
   return costumes;
 };
 
-const getCostumeById = async (id: string): Promise<ICostume | undefined> => {
+const getCostumeById = async (id: string): Promise<ICostume | null> => {
   const costume = await Costume.findById(id);
-  if (!costume) {
-    return undefined;
-  }
   return costume;
 };
 

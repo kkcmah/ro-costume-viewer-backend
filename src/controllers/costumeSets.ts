@@ -12,6 +12,11 @@ import {
 const costumeSetsRouter = Router();
 // baseurl = api/costumeSets
 
+costumeSetsRouter.get("/", async (_req, res) => {
+  const costumeSets = await costumeSetsService.getAllPublicCostumeSets();
+  res.status(200).json({ costumeSets });
+});
+
 // create a costume set
 costumeSetsRouter.post("/", middleware.userExtractor, async (req, res) => {
   if (!req.user || !req.user.id) {
@@ -123,38 +128,34 @@ costumeSetsRouter.post(
 );
 
 // update a costume set
-costumeSetsRouter.patch(
-  "/:id",
-  middleware.userExtractor,
-  async (req, res) => {
-    if (!req.user || !req.user.id) {
-      return res
-        .status(400)
-        .json({ error: "You must be logged in to update a costume set" });
-    }
-
-    const costumeSetToUpdate = await costumeSetsService.getCostumeSetById(
-      req.params.id
-    );
-    if (
-      !costumeSetToUpdate ||
-      costumeSetToUpdate.owner.toString() !== req.user.id.toString()
-    ) {
-      return res.status(401).json({
-        error: "You do not have permissions to update this costume set",
-      });
-    }
-
-    const updatedCostumeSetFields = await toCostumeSetUpdatableFields(req.body);
-    const updatedCostumeSet = await costumeSetsService.updateCostumeSet(
-      req.params.id,
-      updatedCostumeSetFields
-    );
-    if (!updatedCostumeSet) {
-      return res.status(400).json({ error: "failed to update costume set" });
-    }
-    return res.status(200).json(updatedCostumeSet);
+costumeSetsRouter.patch("/:id", middleware.userExtractor, async (req, res) => {
+  if (!req.user || !req.user.id) {
+    return res
+      .status(400)
+      .json({ error: "You must be logged in to update a costume set" });
   }
-);
+
+  const costumeSetToUpdate = await costumeSetsService.getCostumeSetById(
+    req.params.id
+  );
+  if (
+    !costumeSetToUpdate ||
+    costumeSetToUpdate.owner.toString() !== req.user.id.toString()
+  ) {
+    return res.status(401).json({
+      error: "You do not have permissions to update this costume set",
+    });
+  }
+
+  const updatedCostumeSetFields = await toCostumeSetUpdatableFields(req.body);
+  const updatedCostumeSet = await costumeSetsService.updateCostumeSet(
+    req.params.id,
+    updatedCostumeSetFields
+  );
+  if (!updatedCostumeSet) {
+    return res.status(400).json({ error: "failed to update costume set" });
+  }
+  return res.status(200).json(updatedCostumeSet);
+});
 
 export default costumeSetsRouter;

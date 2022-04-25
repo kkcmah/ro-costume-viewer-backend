@@ -1,13 +1,20 @@
 import CostumeSet, { ICostumeSet } from "../models/costumeSet";
 import { CostumeSetUpdatableFields, NewCostumeSet } from "../types";
 
-const getCostumeSetById = async (
-  id: string
-): Promise<ICostumeSet | undefined> => {
+const getAllPublicCostumeSets = async () => {
+  return await CostumeSet.find({ isPublic: true })
+    .populate("owner", "username")
+    .populate({
+      path: "costumes",
+      select: ["itemId", "name", "costumeTags"],
+    //   populate: {
+    //     path: "costumeTags",
+    //   },
+    });
+};
+
+const getCostumeSetById = async (id: string): Promise<ICostumeSet | null> => {
   const costumeSet = await CostumeSet.findById(id);
-  if (!costumeSet) {
-    return undefined;
-  }
   return costumeSet;
 };
 
@@ -55,6 +62,7 @@ const updateCostumeSet = async (
 };
 
 export default {
+  getAllPublicCostumeSets,
   getCostumeSetById,
   addCostumeSet,
   deleteCostumeSet,
