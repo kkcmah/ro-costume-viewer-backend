@@ -8,11 +8,13 @@ import { toCostumeId, toNewCostume } from "../utils/typeParsers/costumes";
 const costumesRouter = Router();
 // baseurl = api/costumes
 
+// get all costumes
 costumesRouter.get("/", async (_req, res) => {
   const costumes = await costumesService.getAllCostumes();
   res.status(200).json(costumes);
 });
 
+// admin create new costume
 costumesRouter.post(
   "/",
   middleware.userExtractor,

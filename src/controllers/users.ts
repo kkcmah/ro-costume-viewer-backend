@@ -7,6 +7,7 @@ import middleware from "../utils/middleware";
 const usersRouter = Router();
 // baseurl = api/users
 
+// admin get all users
 usersRouter.get(
   "/",
   middleware.userExtractor,

@@ -12,6 +12,7 @@ import {
 const costumeSetsRouter = Router();
 // baseurl = api/costumeSets
 
+// get all public costumes
 costumeSetsRouter.get("/", async (_req, res) => {
   const costumeSets = await costumeSetsService.getAllPublicCostumeSets();
   res.status(200).json({ costumeSets });

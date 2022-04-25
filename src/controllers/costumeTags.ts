@@ -20,10 +20,17 @@ costumeTagsRouter.post(
   middleware.isUserAdmin,
   async (req, res) => {
     const newCostumeTag = toNewCostumeTag(req.body);
-    const addedCostumeTag = await costumeTagsService.addCostumeTag(
-      newCostumeTag
+    const existingCostumeTag = await costumeTagsService.getCostumeTagByName(
+      newCostumeTag.name
     );
-    res.status(201).json(addedCostumeTag);
+    if (existingCostumeTag) {
+      res.status(400).json({ error: "costume tag must be unique" });
+    } else {
+      const addedCostumeTag = await costumeTagsService.addCostumeTag(
+        newCostumeTag
+      );
+      res.status(201).json(addedCostumeTag);
+    }
   }
 );
 

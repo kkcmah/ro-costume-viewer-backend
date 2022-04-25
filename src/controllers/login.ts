@@ -6,10 +6,12 @@ import { toUserLoginCreds } from "../utils/typeParsers/users";
 const loginRouter = Router();
 // baseurl = api/login
 
+// ping pong
 loginRouter.get("/ping", (_req, res) => {
   res.json({ message: "login pong" });
 });
 
+// login user
 loginRouter.post("/", async (req, res) => {
   const { username, password } = toUserLoginCreds(req.body);
 

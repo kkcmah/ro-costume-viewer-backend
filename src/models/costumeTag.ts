@@ -6,7 +6,7 @@ export interface ICostumeTag {
 }
 
 const costumeTagSchema = new mongoose.Schema<ICostumeTag>({
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
 });
 
 const CostumeTag = mongoose.model<ICostumeTag>("CostumeTag", costumeTagSchema);
