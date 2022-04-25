@@ -13,6 +13,8 @@ import middleware from "./utils/middleware";
 
 import testingRouter from "./controllers/testing";
 import profileRouter from "./controllers/profile";
+import costumeSetsRouter from "./controllers/costumeSets";
+import costumeTagsRouter from "./controllers/costumeTags";
 
 void mongoose.connect(config.MONGODB_URI as string);
 
@@ -29,6 +31,8 @@ app.use("/api/users", usersRouter);
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 app.use("/api/profile", middleware.userExtractor, profileRouter);
 app.use("/api/costumes", costumesRouter);
+app.use("/api/costumeSets", costumeSetsRouter);
+app.use("/api/costumeTags", costumeTagsRouter);
 app.use("/api/login", loginRouter);
 
 if (process.env.NODE_ENV === "test") {

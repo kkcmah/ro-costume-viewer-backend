@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import costumesService from "../../services/costumesService";
+import costumeTagsService from "../../services/costumeTagsService";
 import { EquipSlot, NewCostume } from "../../types";
 import { isEquipSlot, isNumber, isString, ParseError } from "./helpers";
 
@@ -49,7 +49,7 @@ const parseCostumeTags = async (
   if (!costumeTags || !Array.isArray(costumeTags)) {
     throw new ParseError("Malformatted or missing costumeTags " + costumeTags);
   }
-  const dbCostumeTags = await costumesService.getAllCostumeTags();
+  const dbCostumeTags = await costumeTagsService.getAllCostumeTags();
 
   return costumeTags.map((tag) => {
     if (!tag || !isString(tag)) {
