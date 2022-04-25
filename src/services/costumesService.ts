@@ -21,22 +21,8 @@ const getCostumesByIds = async (costumeIds: string[]): Promise<ICostume[]> => {
   return costumes;
 };
 
-const addCostume = async ({
-  itemId,
-  name,
-  equipSlots,
-  costumeTags,
-  previewUrl,
-  className,
-}: NewCostume): Promise<ICostume> => {
-  const costumeToAdd = new Costume({
-    itemId,
-    name,
-    equipSlots,
-    costumeTags,
-    previewUrl,
-    className,
-  });
+const addCostume = async (newCostume: NewCostume): Promise<ICostume> => {
+  const costumeToAdd = new Costume(newCostume);
   const addedCostume = await costumeToAdd.save();
   return addedCostume;
 };

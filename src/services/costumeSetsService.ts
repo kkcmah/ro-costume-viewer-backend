@@ -1,7 +1,6 @@
 import CostumeSet, { ICostumeSet } from "../models/costumeSet";
 import { CostumeSetUpdatableFields, NewCostumeSet } from "../types";
 
-
 const getCostumeSetById = async (
   id: string
 ): Promise<ICostumeSet | undefined> => {
@@ -12,22 +11,10 @@ const getCostumeSetById = async (
   return costumeSet;
 };
 
-const addCostumeSet = async ({
-  name,
-  description,
-  costumes,
-  likes,
-  owner,
-  isPublic,
-}: NewCostumeSet): Promise<ICostumeSet> => {
-  const costumeSetToAdd = new CostumeSet({
-    name,
-    description,
-    costumes,
-    likes,
-    owner,
-    isPublic,
-  });
+const addCostumeSet = async (
+  newCostumeSet: NewCostumeSet
+): Promise<ICostumeSet> => {
+  const costumeSetToAdd = new CostumeSet(newCostumeSet);
   const addedCostumeSet = await costumeSetToAdd.save();
   return addedCostumeSet;
 };
