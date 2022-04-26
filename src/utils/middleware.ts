@@ -18,17 +18,17 @@ const userExtractor = async (
   next: NextFunction
 ) => {
   if (!req.token) {
-    req.token = "";
+    return res.status(401).json({ error: "token missing or invalid" });
   }
   const decodedToken = jwt.verify(
     req.token,
     process.env.SECRET as string
   ) as UserToken;
   if (!decodedToken.id) {
-    res.status(401).json({ error: "token missing or invalid" });
+    return res.status(401).json({ error: "token missing or invalid" });
   }
   req.user = await usersService.getUserById(decodedToken.id);
-  next();
+  return next();
 };
 
 const isUserAdmin = (req: Request, res: Response, next: NextFunction) => {

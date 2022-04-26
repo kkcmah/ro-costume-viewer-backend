@@ -15,16 +15,16 @@ loginRouter.get("/ping", (_req, res) => {
 loginRouter.post("/", async (req, res) => {
   const { username, password } = toUserLoginCreds(req.body);
 
-  let token;
+  let userWithToken;
   try {
-    token = await usersService.verifyUser({ username, password });
+    userWithToken = await usersService.verifyUser({ username, password });
   } catch (error) {
     return res.status(401).json({
       error: "invalid username or password",
     });
   }
 
-  return res.status(200).send({ token, username });
+  return res.status(200).json(userWithToken);
 });
 
 export default loginRouter;

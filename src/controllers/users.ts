@@ -17,6 +17,11 @@ usersRouter.get(
   }
 );
 
+// get requesting user's info
+usersRouter.get("/self", middleware.userExtractor, (req, res) => {
+  res.json(req.user);
+});
+
 // sign up
 usersRouter.post("/", async (req, res) => {
   const { username, password } = toUserLoginCreds(req.body);

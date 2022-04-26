@@ -32,6 +32,10 @@ export interface UserLoginCreds {
   password: string;
 }
 
+export interface UserWithToken extends IUser{
+  token: string;
+}
+
 export type NewCostume = Omit<ICostume, "id">;
 export type NewCostumeSet = Omit<ICostumeSet, "id">;
 export type NewCostumeTag = Omit<ICostumeTag, "id">;

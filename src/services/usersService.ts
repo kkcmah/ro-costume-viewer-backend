@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User, { IUser } from "../models/user";
-import { UserLoginCreds, UserToken } from "../types";
+import { UserLoginCreds, UserToken, UserWithToken } from "../types";
 
 const getAllUsers = async (): Promise<IUser[]> => {
   const users = await User.find({});
@@ -34,7 +34,7 @@ const addUser = async ({
 const verifyUser = async ({
   username,
   password,
-}: UserLoginCreds): Promise<string> => {
+}: UserLoginCreds): Promise<UserWithToken> => {
   const user = await User.findOne({ username });
   const passwordCorrect = !user
     ? false
@@ -49,7 +49,7 @@ const verifyUser = async ({
   const token = jwt.sign(userForToken, process.env.SECRET as string, {
     expiresIn: "1d",
   });
-  return token;
+  return {token, ...user.toJSON()};
 };
 
 const favoriteCostume = async (user: IUser, costumeId: string) => {
