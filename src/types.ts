@@ -20,6 +20,7 @@ export enum EquipSlot {
   Middle = "Middle",
   Lower = "Lower",
   Garment = "Garment",
+  Effect = "Effect",
 }
 
 export interface UserToken {
@@ -32,7 +33,7 @@ export interface UserLoginCreds {
   password: string;
 }
 
-export interface UserWithToken extends IUser{
+export interface UserWithToken extends IUser {
   token: string;
 }
 
@@ -41,3 +42,32 @@ export type NewCostumeSet = Omit<ICostumeSet, "id">;
 export type NewCostumeTag = Omit<ICostumeTag, "id">;
 
 export type CostumeSetUpdatableFields = Omit<NewCostumeSet, "likes" | "owner">;
+
+export interface CostumesSearchParams {
+  rows: number;
+  page: number;
+  itemId: number | null;
+  name: string | null;
+  equipSlots: EquipSlot[] | null;
+  rowsOptions: number[];
+  correctedParams: CorrectedCostumesSearchParams;
+}
+
+// make params optional and of type string for url on client side
+// https://stackoverflow.com/questions/59796713/type-for-with-same-field-names-but-different-types
+export type CorrectedCostumesSearchParams = {
+  [K in keyof Omit<
+    CostumesSearchParams,
+    "rowsOptions" | "correctedParams"
+  >]+?: string;
+};
+
+export interface CostumesWithCount {
+  costumes: ICostume[];
+  count: number;
+}
+
+export interface CostumeListRetObj extends CostumesWithCount {
+  rowsOptions: number[];
+  correctedParams: CorrectedCostumesSearchParams;
+}

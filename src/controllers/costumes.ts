@@ -2,16 +2,38 @@
 import { Router } from "express";
 import costumesService from "../services/costumesService";
 import usersService from "../services/usersService";
+import { CostumeListRetObj } from "../types";
 import middleware from "../utils/middleware";
 import { toCostumeId, toNewCostume } from "../utils/typeParsers/costumes";
+import { toCostumesSearchParams } from "../utils/typeParsers/costumesSearchParams";
 
 const costumesRouter = Router();
 // baseurl = api/costumes
 
-// get all costumes
-costumesRouter.get("/", async (_req, res) => {
-  const costumes = await costumesService.getAllCostumes();
-  res.status(200).json(costumes);
+// admin get all costumes
+costumesRouter.get(
+  "/",
+  middleware.userExtractor,
+  middleware.isUserAdmin,
+  async (_req, res) => {
+    const costumes = await costumesService.getAllCostumes();
+    res.status(200).json(costumes);
+  }
+);
+
+// handle query of form /params?name=cat&page=3....
+// params: rows, page, itemId, name, equipSlots
+costumesRouter.get("/params", async (req, res) => {
+  const costumesSearchParams = toCostumesSearchParams(req.query);
+  const costumesWithCount = await costumesService.getCostumesByParams(
+    costumesSearchParams
+  );
+  const costumeListRetObj: CostumeListRetObj = {
+    ...costumesWithCount,
+    rowsOptions: costumesSearchParams.rowsOptions,
+    correctedParams: costumesSearchParams.correctedParams,
+  };
+  res.status(200).json(costumeListRetObj);
 });
 
 // admin create new costume
