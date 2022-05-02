@@ -20,7 +20,8 @@ const getCostumesByParams = async (
     .sort({ name: 1 })
     .collation({ locale: "en", caseLevel: true })
     .skip(params.page * params.rows)
-    .limit(params.rows);
+    .limit(params.rows)
+    .populate("costumeTags");
 
   const count = await Costume.find(query).countDocuments();
   return { costumes, count };
