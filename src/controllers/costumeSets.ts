@@ -15,7 +15,7 @@ const costumeSetsRouter = Router();
 // get all public costumes
 costumeSetsRouter.get("/", async (_req, res) => {
   const costumeSets = await costumeSetsService.getAllPublicCostumeSets();
-  res.status(200).json({ costumeSets });
+  res.status(200).json(costumeSets);
 });
 
 // create a costume set
@@ -33,13 +33,13 @@ costumeSetsRouter.post("/", middleware.userExtractor, async (req, res) => {
 });
 
 // delete a costume set if user is owner
-costumeSetsRouter.delete("/", middleware.userExtractor, async (req, res) => {
+costumeSetsRouter.delete("/:id", middleware.userExtractor, async (req, res) => {
   if (!req.user || !req.user.id) {
     return res
       .status(400)
       .json({ error: "You must be logged in to delete a costume set" });
   }
-  const costumeSetIdToDelete = toCostumeSetId(req.body);
+  const costumeSetIdToDelete = toCostumeSetId(req.params.id);
   const costumeSetToDel = await costumeSetsService.getCostumeSetById(
     costumeSetIdToDelete
   );

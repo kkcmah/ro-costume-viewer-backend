@@ -6,10 +6,10 @@ const getAllPublicCostumeSets = async () => {
     .populate("owner", "username")
     .populate({
       path: "costumes",
-      select: ["itemId", "name", "costumeTags"],
-    //   populate: {
-    //     path: "costumeTags",
-    //   },
+      // select: ["itemId", "name", "costumeTags"],
+      populate: {
+        path: "costumeTags",
+      },
     });
 };
 
