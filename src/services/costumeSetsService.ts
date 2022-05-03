@@ -1,5 +1,10 @@
 import CostumeSet, { ICostumeSet } from "../models/costumeSet";
-import { CostumeSetUpdatableFields, NewCostumeSet } from "../types";
+import {
+  CostumeSetsPagedParams,
+  CostumeSetsWithCount,
+  CostumeSetUpdatableFields,
+  NewCostumeSet,
+} from "../types";
 
 const getAllPublicCostumeSets = async () => {
   return await CostumeSet.find({ isPublic: true })
@@ -11,6 +16,40 @@ const getAllPublicCostumeSets = async () => {
         path: "costumeTags",
       },
     });
+};
+
+const getPublicCostumeSetsPaged = async (
+  params: CostumeSetsPagedParams
+): Promise<CostumeSetsWithCount> => {
+  const query: { [key: string]: string | number | object | boolean } = {};
+
+  if (params.name !== null) {
+    query.name = { $regex: new RegExp(params.name, "i") };
+  }
+  if (params.lastSeenIds !== null) {
+    query._id = { $nin: params.lastSeenIds };
+  }
+  if (params.lastLikeValue !== null) {
+    query.likes = { $lte: params.lastLikeValue };
+  }
+  query.isPublic = true;
+  console.log("PARAMS", params);
+  console.log("QUERY", query);
+
+  const costumeSets = await CostumeSet.find(query)
+    .sort({ likes: -1 })
+    .collation({ locale: "en", caseLevel: true })
+    .limit(20)
+    .populate("owner", "username")
+    .populate({
+      path: "costumes",
+      populate: {
+        path: "costumeTags",
+      },
+    });
+
+  const count = await CostumeSet.find(query).countDocuments();
+  return { costumeSets, count };
 };
 
 const getCostumeSetById = async (id: string): Promise<ICostumeSet | null> => {
@@ -63,6 +102,7 @@ const updateCostumeSet = async (
 
 export default {
   getAllPublicCostumeSets,
+  getPublicCostumeSetsPaged,
   getCostumeSetById,
   addCostumeSet,
   deleteCostumeSet,

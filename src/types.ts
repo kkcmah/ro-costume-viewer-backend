@@ -71,3 +71,14 @@ export interface CostumeListRetObj extends CostumesWithCount {
   rowsOptions: number[];
   correctedParams: CorrectedCostumesSearchParams;
 }
+
+export interface CostumeSetsPagedParams {
+  lastSeenIds: string[] | null;
+  name: string | null;
+  lastLikeValue: number | null;
+}
+
+export interface CostumeSetsWithCount {
+  costumeSets: ICostumeSet[];
+  count: number;
+}

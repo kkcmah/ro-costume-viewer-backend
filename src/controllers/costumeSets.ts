@@ -8,14 +8,28 @@ import {
   toCostumeSetUpdatableFields,
   toNewCostumeSet,
 } from "../utils/typeParsers/costumeSet";
+import { toCostumeSetsPagedParams } from "../utils/typeParsers/costumeSetsPagedParams";
 
 const costumeSetsRouter = Router();
 // baseurl = api/costumeSets
 
-// get all public costumes
-costumeSetsRouter.get("/", async (_req, res) => {
-  const costumeSets = await costumeSetsService.getAllPublicCostumeSets();
-  res.status(200).json(costumeSets);
+// admin get all public costume sets
+costumeSetsRouter.get(
+  "/",
+  middleware.userExtractor,
+  middleware.isUserAdmin,
+  async (_req, res) => {
+    const costumeSets = await costumeSetsService.getAllPublicCostumeSets();
+    res.status(200).json(costumeSets);
+  }
+);
+
+// get paged costume sets
+costumeSetsRouter.post("/params", async (req, res) => {
+  const costumeSetsPagedParams = toCostumeSetsPagedParams(req.body);
+  const costumeSetsWithCount =
+    await costumeSetsService.getPublicCostumeSetsPaged(costumeSetsPagedParams);
+  res.status(200).json(costumeSetsWithCount);
 });
 
 // create a costume set
