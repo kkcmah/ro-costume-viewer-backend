@@ -52,6 +52,23 @@ const getPublicCostumeSetsPaged = async (
   return { costumeSets, count };
 };
 
+const getPublicCostumeSetById = async (
+  id: string
+): Promise<ICostumeSet | null> => {
+  const costumeSet = await CostumeSet.findById(id)
+    .populate("owner", "username")
+    .populate({
+      path: "costumes",
+      populate: {
+        path: "costumeTags",
+      },
+    });
+  if (costumeSet && !costumeSet.isPublic) {
+    return null;
+  }
+  return costumeSet;
+};
+
 const getCostumeSetById = async (id: string): Promise<ICostumeSet | null> => {
   const costumeSet = await CostumeSet.findById(id);
   return costumeSet;
@@ -103,6 +120,7 @@ const updateCostumeSet = async (
 export default {
   getAllPublicCostumeSets,
   getPublicCostumeSetsPaged,
+  getPublicCostumeSetById,
   getCostumeSetById,
   addCostumeSet,
   deleteCostumeSet,

@@ -24,6 +24,15 @@ costumeSetsRouter.get(
   }
 );
 
+// get a single public costume set by id
+costumeSetsRouter.get("/:costumeSetId", async (req, res) => {
+  const costumeSetId = toCostumeSetId(req.params);
+  const costumeSet = await costumeSetsService.getPublicCostumeSetById(
+    costumeSetId
+  );
+  res.status(200).json(costumeSet);
+});
+
 // get paged costume sets
 costumeSetsRouter.post("/params", async (req, res) => {
   const costumeSetsPagedParams = toCostumeSetsPagedParams(req.body);
@@ -47,34 +56,38 @@ costumeSetsRouter.post("/", middleware.userExtractor, async (req, res) => {
 });
 
 // delete a costume set if user is owner
-costumeSetsRouter.delete("/:id", middleware.userExtractor, async (req, res) => {
-  if (!req.user || !req.user.id) {
-    return res
-      .status(400)
-      .json({ error: "You must be logged in to delete a costume set" });
-  }
-  const costumeSetIdToDelete = toCostumeSetId(req.params.id);
-  const costumeSetToDel = await costumeSetsService.getCostumeSetById(
-    costumeSetIdToDelete
-  );
-
-  if (!costumeSetToDel) {
-    return res.status(200).json({ message: "costume set already deleted" });
-  }
-
-  if (costumeSetToDel.owner.toString() === req.user.id.toString()) {
-    const deletedCostumeSet = await costumeSetsService.deleteCostumeSet(
+costumeSetsRouter.delete(
+  "/:costumeSetId",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(400)
+        .json({ error: "You must be logged in to delete a costume set" });
+    }
+    const costumeSetIdToDelete = toCostumeSetId(req.params);
+    const costumeSetToDel = await costumeSetsService.getCostumeSetById(
       costumeSetIdToDelete
     );
-    return res
-      .status(200)
-      .json({ message: `deleted set name: ${deletedCostumeSet?.name}` });
-  } else {
-    return res
-      .status(401)
-      .json({ error: "You are not the owner of this costume set" });
+
+    if (!costumeSetToDel) {
+      return res.status(200).json({ message: "costume set already deleted" });
+    }
+
+    if (costumeSetToDel.owner.toString() === req.user.id.toString()) {
+      const deletedCostumeSet = await costumeSetsService.deleteCostumeSet(
+        costumeSetIdToDelete
+      );
+      return res
+        .status(200)
+        .json({ message: `deleted set name: ${deletedCostumeSet?.name}` });
+    } else {
+      return res
+        .status(401)
+        .json({ error: "You are not the owner of this costume set" });
+    }
   }
-});
+);
 
 // like a costume set
 costumeSetsRouter.post(
