@@ -36,6 +36,43 @@ costumesRouter.get("/params", async (req, res) => {
   res.status(200).json(costumeListRetObj);
 });
 
+// get users favorite costumes paginated
+costumesRouter.get(
+  "/profilefav/params",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user) {
+      return res
+        .status(400)
+        .json({ error: "you must be logged in to view favorite costumes" });
+    }
+
+    if (req.user.favCostumes.length === 0) {
+      // return a dummy empty object to avoid hitting database
+      const emptyRetObj: CostumeListRetObj = {
+        rowsOptions: [],
+        correctedParams: {},
+        costumes: [],
+        count: 0,
+      };
+      return res.json(emptyRetObj);
+    }
+
+    const costumesSearchParams = toCostumesSearchParams(req.query);
+    const costumesWithCount = await costumesService.getCostumesByParams(
+      costumesSearchParams,
+      true,
+      req.user.favCostumes
+    );
+    const costumeListRetObj: CostumeListRetObj = {
+      ...costumesWithCount,
+      rowsOptions: costumesSearchParams.rowsOptions,
+      correctedParams: costumesSearchParams.correctedParams,
+    };
+    return res.status(200).json(costumeListRetObj);
+  }
+);
+
 // admin create new costume
 costumesRouter.post(
   "/",
