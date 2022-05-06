@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import CostumeSet, { ICostumeSet } from "../models/costumeSet";
 import {
   CostumeSetsPagedParams,
@@ -33,13 +34,60 @@ const getPublicCostumeSetsPaged = async (
     query.likes = { $lte: params.lastLikeValue };
   }
   query.isPublic = true;
-  console.log("PARAMS", params);
-  console.log("QUERY", query);
+
+  console.log("PARAMS public", params);
+  console.log("QUERY public", query);
 
   const costumeSets = await CostumeSet.find(query)
     .sort({ likes: -1 })
     .collation({ locale: "en", caseLevel: true })
-    .limit(20)
+    .limit(10)
+    .populate("owner", "username")
+    .populate({
+      path: "costumes",
+      populate: {
+        path: "costumeTags",
+      },
+    });
+
+  const count = await CostumeSet.find(query).countDocuments();
+  return { costumeSets, count };
+};
+
+const getLikedCostumeSetsPaged = async (
+  params: CostumeSetsPagedParams,
+  likedCostumeSetIds: mongoose.Types.ObjectId[],
+  profileOwnerId: mongoose.Types.ObjectId
+): Promise<CostumeSetsWithCount> => {
+  const query: { [key: string]: string | number | object | boolean } = {};
+
+  if (params.name !== null) {
+    query.name = { $regex: new RegExp(params.name, "i") };
+  }
+
+  if (params.lastLikeValue !== null) {
+    query.likes = { $lte: params.lastLikeValue };
+  }
+
+  if (params.lastSeenIds !== null) {
+    query.$and = [
+      { _id: { $nin: params.lastSeenIds } },
+      { _id: { $in: likedCostumeSetIds } },
+    ];
+  } else {
+    query._id = { $in: likedCostumeSetIds };
+  }
+
+  // isPublic or user liked own private set
+  query.$or = [{ isPublic: true }, { owner: profileOwnerId }];
+
+  console.log("PARAMS liked", params);
+  console.log("QUERY liked", query);
+
+  const costumeSets = await CostumeSet.find(query)
+    .sort({ likes: -1 })
+    .collation({ locale: "en", caseLevel: true })
+    .limit(10)
     .populate("owner", "username")
     .populate({
       path: "costumes",
@@ -121,6 +169,7 @@ export default {
   getAllPublicCostumeSets,
   getPublicCostumeSetsPaged,
   getPublicCostumeSetById,
+  getLikedCostumeSetsPaged,
   getCostumeSetById,
   addCostumeSet,
   deleteCostumeSet,

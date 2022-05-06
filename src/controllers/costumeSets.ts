@@ -2,6 +2,7 @@
 import { Router } from "express";
 import costumeSetsService from "../services/costumeSetsService";
 import usersService from "../services/usersService";
+import { CostumeSetsWithCount } from "../types";
 import middleware from "../utils/middleware";
 import {
   toCostumeSetId,
@@ -40,6 +41,37 @@ costumeSetsRouter.post("/params", async (req, res) => {
     await costumeSetsService.getPublicCostumeSetsPaged(costumeSetsPagedParams);
   res.status(200).json(costumeSetsWithCount);
 });
+
+// get users liked costume sets paged from profile
+costumeSetsRouter.post(
+  "/profileliked/params",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(400)
+        .json({ error: "you must be logged in to view liked costume sets" });
+    }
+
+    if (req.user.likedCostumeSets.length === 0) {
+      // return a dummy empty object to avoid hitting database
+      const emptyRetObj: CostumeSetsWithCount = {
+        costumeSets: [],
+        count: 0,
+      };
+      return res.json(emptyRetObj);
+    }
+
+    const costumeSetsPagedParams = toCostumeSetsPagedParams(req.body);
+    const costumeSetsWithCount =
+      await costumeSetsService.getLikedCostumeSetsPaged(
+        costumeSetsPagedParams,
+        req.user.likedCostumeSets,
+        req.user.id
+      );
+    return res.status(200).json(costumeSetsWithCount);
+  }
+);
 
 // create a costume set
 costumeSetsRouter.post("/", middleware.userExtractor, async (req, res) => {
