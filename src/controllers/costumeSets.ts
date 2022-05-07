@@ -34,6 +34,32 @@ costumeSetsRouter.get("/:costumeSetId", async (req, res) => {
   res.status(200).json(costumeSet);
 });
 
+// get a owned costume set by id used when editing or profile
+costumeSetsRouter.get(
+  "/owned/:costumeSetId",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ error: "you must be logged in" });
+    }
+
+    const costumeSetId = toCostumeSetId(req.params);
+    const costumeSet = await costumeSetsService.getCostumeSetById(costumeSetId);
+
+    if (!costumeSet) {
+      return res.status(400).json({ error: "could not locate costume set" });
+    }
+
+    if (costumeSet.owner.id.toString() === req.user.id.toString()) {
+      return res.status(200).json(costumeSet);
+    } else {
+      return res
+        .status(401)
+        .json({ error: "You are not the owner of this costume set" });
+    }
+  }
+);
+
 // get paged costume sets
 costumeSetsRouter.post("/params", async (req, res) => {
   const costumeSetsPagedParams = toCostumeSetsPagedParams(req.body);
@@ -73,6 +99,27 @@ costumeSetsRouter.post(
   }
 );
 
+// get users owned costume sets paged from profile
+costumeSetsRouter.post(
+  "/owned/params",
+  middleware.userExtractor,
+  async (req, res) => {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(400)
+        .json({ error: "you must be logged in to view your costume sets" });
+    }
+
+    const costumeSetsPagedParams = toCostumeSetsPagedParams(req.body);
+    const costumeSetsWithCount =
+      await costumeSetsService.getOwnedCostumeSetsPaged(
+        costumeSetsPagedParams,
+        req.user.id
+      );
+    return res.status(200).json(costumeSetsWithCount);
+  }
+);
+
 // create a costume set
 costumeSetsRouter.post("/", middleware.userExtractor, async (req, res) => {
   if (!req.user || !req.user.id) {
@@ -106,7 +153,7 @@ costumeSetsRouter.delete(
       return res.status(200).json({ message: "costume set already deleted" });
     }
 
-    if (costumeSetToDel.owner.toString() === req.user.id.toString()) {
+    if (costumeSetToDel.owner.id.toString() === req.user.id.toString()) {
       const deletedCostumeSet = await costumeSetsService.deleteCostumeSet(
         costumeSetIdToDelete
       );
@@ -200,7 +247,7 @@ costumeSetsRouter.patch("/:id", middleware.userExtractor, async (req, res) => {
   );
   if (
     !costumeSetToUpdate ||
-    costumeSetToUpdate.owner.toString() !== req.user.id.toString()
+    costumeSetToUpdate.owner.id.toString() !== req.user.id.toString()
   ) {
     return res.status(401).json({
       error: "You do not have permissions to update this costume set",

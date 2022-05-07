@@ -18,14 +18,18 @@ const userExtractor = async (
   next: NextFunction
 ) => {
   if (!req.token) {
-    return res.status(401).json({ error: "token missing or invalid" });
+    return res
+      .status(401)
+      .json({ error: "token missing or invalid. Please relogin" });
   }
   const decodedToken = jwt.verify(
     req.token,
     process.env.SECRET as string
   ) as UserToken;
   if (!decodedToken.id) {
-    return res.status(401).json({ error: "token missing or invalid" });
+    return res
+      .status(401)
+      .json({ error: "token missing or invalid. Please relogin" });
   }
   req.user = await usersService.getUserById(decodedToken.id);
   return next();

@@ -100,6 +100,45 @@ const getLikedCostumeSetsPaged = async (
   return { costumeSets, count };
 };
 
+const getOwnedCostumeSetsPaged = async (
+  params: CostumeSetsPagedParams,
+  profileOwnerId: mongoose.Types.ObjectId
+): Promise<CostumeSetsWithCount> => {
+  const query: { [key: string]: string | number | object | boolean } = {};
+
+  if (params.name !== null) {
+    query.name = { $regex: new RegExp(params.name, "i") };
+  }
+
+  if (params.lastLikeValue !== null) {
+    query.likes = { $lte: params.lastLikeValue };
+  }
+
+  if (params.lastSeenIds !== null) {
+    query._id = { $nin: params.lastSeenIds };
+  }
+
+  query.owner = profileOwnerId;
+
+  console.log("PARAMS owned", params);
+  console.log("QUERY owned", query);
+
+  const costumeSets = await CostumeSet.find(query)
+    .sort({ likes: -1 })
+    .collation({ locale: "en", caseLevel: true })
+    .limit(10)
+    .populate("owner", "username")
+    .populate({
+      path: "costumes",
+      populate: {
+        path: "costumeTags",
+      },
+    });
+
+  const count = await CostumeSet.find(query).countDocuments();
+  return { costumeSets, count };
+};
+
 const getPublicCostumeSetById = async (
   id: string
 ): Promise<ICostumeSet | null> => {
@@ -118,7 +157,14 @@ const getPublicCostumeSetById = async (
 };
 
 const getCostumeSetById = async (id: string): Promise<ICostumeSet | null> => {
-  const costumeSet = await CostumeSet.findById(id);
+  const costumeSet = await CostumeSet.findById(id)
+    .populate("owner", "username")
+    .populate({
+      path: "costumes",
+      populate: {
+        path: "costumeTags",
+      },
+    });
   return costumeSet;
 };
 
@@ -170,6 +216,7 @@ export default {
   getPublicCostumeSetsPaged,
   getPublicCostumeSetById,
   getLikedCostumeSetsPaged,
+  getOwnedCostumeSetsPaged,
   getCostumeSetById,
   addCostumeSet,
   deleteCostumeSet,
