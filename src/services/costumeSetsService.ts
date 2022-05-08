@@ -35,11 +35,9 @@ const getPublicCostumeSetsPaged = async (
   }
   query.isPublic = true;
 
-  console.log("PARAMS public", params);
-  console.log("QUERY public", query);
-
   const costumeSets = await CostumeSet.find(query)
     .sort({ likes: -1 })
+    .sort({ name: 1 })
     .collation({ locale: "en", caseLevel: true })
     .limit(10)
     .populate("owner", "username")
@@ -81,11 +79,9 @@ const getLikedCostumeSetsPaged = async (
   // isPublic or user liked own private set
   query.$or = [{ isPublic: true }, { owner: profileOwnerId }];
 
-  console.log("PARAMS liked", params);
-  console.log("QUERY liked", query);
-
   const costumeSets = await CostumeSet.find(query)
     .sort({ likes: -1 })
+    .sort({ name: 1 })
     .collation({ locale: "en", caseLevel: true })
     .limit(10)
     .populate("owner", "username")
@@ -120,11 +116,9 @@ const getOwnedCostumeSetsPaged = async (
 
   query.owner = profileOwnerId;
 
-  console.log("PARAMS owned", params);
-  console.log("QUERY owned", query);
-
   const costumeSets = await CostumeSet.find(query)
     .sort({ likes: -1 })
+    .sort({ name: 1 })
     .collation({ locale: "en", caseLevel: true })
     .limit(10)
     .populate("owner", "username")
