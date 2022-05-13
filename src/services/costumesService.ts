@@ -53,10 +53,18 @@ const addCostume = async (newCostume: NewCostume): Promise<ICostume> => {
   return addedCostume;
 };
 
+const addManyCostumes = async (
+  manyNewCostumes: NewCostume[]
+): Promise<ICostume[]> => {
+  const insertedCostumeIds = await Costume.insertMany(manyNewCostumes);
+  return insertedCostumeIds;
+};
+
 export default {
   getAllCostumes,
   getCostumesByParams,
   getCostumeById,
   addCostume,
+  addManyCostumes,
   getCostumesByIds,
 };

@@ -73,7 +73,7 @@ const parseCostumeTags = async (
 };
 
 const parsePreviewUrl = (previewUrl: unknown): string => {
-  if (!previewUrl || !isString(previewUrl)) {
+  if (!isString(previewUrl)) {
     throw new ParseError("Malformatted or missing previewUrl " + previewUrl);
   }
   return previewUrl;
@@ -97,4 +97,14 @@ export const toNewCostume = async (object: any): Promise<NewCostume> => {
     className: parseClassName(object.className),
   };
   return newCostume;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const toManyNewCostumes = async (object: any): Promise<NewCostume[]> => {
+  //const manyNewCostumes: NewCostume[] = [];
+  if (!Array.isArray(object)) {
+    throw new ParseError("Malformatted or missing costumes array " + object);
+  }
+  const manyNewCostumes = await Promise.all(object.map(toNewCostume));
+  return manyNewCostumes;
 };

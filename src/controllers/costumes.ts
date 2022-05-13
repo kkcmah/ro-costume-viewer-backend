@@ -4,7 +4,11 @@ import costumesService from "../services/costumesService";
 import usersService from "../services/usersService";
 import { CostumeListRetObj } from "../types";
 import middleware from "../utils/middleware";
-import { toCostumeId, toNewCostume } from "../utils/typeParsers/costumes";
+import {
+  toCostumeId,
+  toManyNewCostumes,
+  toNewCostume,
+} from "../utils/typeParsers/costumes";
 import { toCostumesSearchParams } from "../utils/typeParsers/costumesSearchParams";
 
 const costumesRouter = Router();
@@ -82,6 +86,20 @@ costumesRouter.post(
     const costumeToAdd = await toNewCostume(req.body);
     const addedCostume = await costumesService.addCostume(costumeToAdd);
     res.status(201).json(addedCostume);
+  }
+);
+
+// admin create many new costumes
+costumesRouter.post(
+  "/many",
+  middleware.userExtractor,
+  middleware.isUserAdmin,
+  async (req, res) => {
+    const manyCostumesToAdd = await toManyNewCostumes(req.body);
+    const addedCostumes = await costumesService.addManyCostumes(
+      manyCostumesToAdd
+    );
+    res.status(201).json(addedCostumes);
   }
 );
 

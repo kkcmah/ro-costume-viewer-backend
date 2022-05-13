@@ -2,12 +2,17 @@
 
 This project is built using Node, Express, and MongoDB.
 
+This is the backend for the frontend found here:
+
+https://github.com
+
 ## .env config setup
 
 Setup the following variables in .env file of project's root
+
 - MONGODB_URI="your mongodb connection"
 - PORT="port of your choosing ex. 3001"
-- TEST_MONGODB_URI="must not be same as MONGODB_URI test mongodb connection"
+- TEST_MONGODB_URI="must not be the same as MONGODB_URI. This is the connection to the test database"
 - SECRET="secret string for signing tokens"
 
 ## Scripts
@@ -20,9 +25,13 @@ Install the project dependencies.
 
 Runs app using ts-node-dev with environment set as development or production.
 
+#### `npm run start:test`
+
+Runs the app in test mode - mainly used for when running Cypress `npm run cypress:open` from the frontend.
+
 #### `npm test`
 
-Launches jest test runner and runs *.test.ts files in src/tests.
+Launches jest test runner and runs \*.test.ts files in src/tests.
 
 #### `npm run build` followed by `npm start-prod`
 

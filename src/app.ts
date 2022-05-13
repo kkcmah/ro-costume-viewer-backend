@@ -19,7 +19,8 @@ import costumeTagsRouter from "./controllers/costumeTags";
 void mongoose.connect(config.MONGODB_URI as string);
 
 app.use(helmet());
-app.use(cors());
+// TODO check if cors works on production
+app.use(cors({ origin: "http://example.com" }));
 app.use(express.static("build"));
 app.use(express.json());
 // use the middleware in all routes

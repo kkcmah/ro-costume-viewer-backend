@@ -6,7 +6,7 @@ import {
 import { isEquipSlot, isNumber, isString } from "./helpers";
 
 const DEFAULT_PAGE = 0;
-const ROWS_OPTIONS = [1, 2, 3];
+const ROWS_OPTIONS = [10, 25, 100];
 
 const parseRows = (rows: unknown): number => {
   if (!isString(rows) || !isNumber(+rows)) {
