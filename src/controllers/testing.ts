@@ -5,12 +5,33 @@ import CostumeSet from "../models/costumeSet";
 import CostumeTag from "../models/costumeTag";
 import User from "../models/user";
 import costumesService from "../services/costumesService";
+import config from "../utils/config";
 import { toManyNewCostumes, toNewCostume } from "../utils/typeParsers/costumes";
 
 const testingRouter = Router();
 // baseurl = api/testing
 // ENSURE this router is only being used in env test and
 // utils/config is pointing at test database
+
+// router level middleware to check that server is in test mode
+testingRouter.use((_req, res, next) => {
+  if (
+    process.env.NODE_ENV !== "test" ||
+    process.env.TEST_MONGODB_URI !== config.MONGODB_URI
+  ) {
+    res.status(401).json({ error: "Server is not in test mode" });
+  } else {
+    next();
+  }
+});
+
+// check to see if server is running in test mode prior to running tests
+testingRouter.get("/", (_req, res) => {
+  res.json(
+    process.env.NODE_ENV === "test" &&
+      process.env.TEST_MONGODB_URI === config.MONGODB_URI
+  );
+});
 
 // reset all users
 testingRouter.post("/resetUsers", async (_req, res) => {
