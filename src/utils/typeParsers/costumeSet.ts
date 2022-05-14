@@ -7,10 +7,8 @@ const parseName = (name: unknown): string => {
   if (!name || !isString(name)) {
     throw new ParseError("Malformatted or missing name " + name);
   }
-  if (name.length < 1 || name.length > 100) {
-    throw new ParseError(
-      "name must be between 1 and 100 characters long: " + name
-    );
+  if (name.length > 100) {
+    throw new ParseError("name must be less than 100 characters long: " + name);
   }
   return name;
 };

@@ -32,9 +32,9 @@ usersRouter.post("/", async (req, res) => {
     });
   }
 
-  if (password.length < 3) {
+  if (password.length < 3 || password.length > 50) {
     return res.status(400).json({
-      error: "password must be longer than 3 characters",
+      error: "password must be between 3 - 50 characters",
     });
   }
 

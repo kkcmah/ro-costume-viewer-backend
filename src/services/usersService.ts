@@ -13,9 +13,7 @@ const getUserById = async (id: string): Promise<IUser | null> => {
   return user;
 };
 
-const getUserByUsername = async (
-  username: string
-): Promise<IUser | null> => {
+const getUserByUsername = async (username: string): Promise<IUser | null> => {
   const existingUser = await User.findOne({ username });
   return existingUser;
 };
@@ -49,7 +47,7 @@ const verifyUser = async ({
   const token = jwt.sign(userForToken, process.env.SECRET as string, {
     expiresIn: "1d",
   });
-  return {token, ...user.toJSON()};
+  return { token, ...user.toJSON() };
 };
 
 const favoriteCostume = async (user: IUser, costumeId: string) => {
@@ -101,5 +99,5 @@ export default {
   favoriteCostume,
   unFavoriteCostume,
   likeCostumeSet,
-  unlikeCostumeSet
+  unlikeCostumeSet,
 };
