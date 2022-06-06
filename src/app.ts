@@ -4,7 +4,7 @@ import helmet from "helmet";
 // eliminates try catch in async await by passing error to next middleware
 require("express-async-errors");
 const app = express();
-import cors from "cors";
+// import cors from "cors";
 import mongoose from "mongoose";
 import costumesRouter from "./controllers/costumes";
 import usersRouter from "./controllers/users";
@@ -19,9 +19,19 @@ import adminRouter from "./controllers/admin";
 
 void mongoose.connect(config.MONGODB_URI as string);
 
-app.use(helmet());
-// TODO check if cors works on production
-app.use(cors({ origin: "http://example.com" }));
+// do hard refresh via ctrl f5 to test helmet header changes,
+// otherwise cached version gets used and it looks like nothing changed
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        mediaSrc: ["'self'", process.env.MEDIA_SRC as string],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
 app.use(express.static("build"));
 app.use(express.json());
 // use the middleware in all routes
