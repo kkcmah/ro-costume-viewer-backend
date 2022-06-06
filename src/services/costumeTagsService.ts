@@ -28,9 +28,15 @@ const addCostumeTag = async (newCostumeTag: NewCostumeTag) => {
   return addedCostumeTag;
 };
 
+const addManyCostumeTags = async (manyCostumeTags: NewCostumeTag[]) => {
+  const addedCostumeTags = await CostumeTag.insertMany(manyCostumeTags);
+  return addedCostumeTags;
+};
+
 export default {
   getAllCostumeTags,
   getCostumeTagByName,
   getCostumeTagsByIds,
   addCostumeTag,
+  addManyCostumeTags,
 };

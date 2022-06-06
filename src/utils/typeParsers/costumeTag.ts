@@ -15,3 +15,16 @@ export const toNewCostumeTag = (object: any): NewCostumeTag => {
   };
   return newCostumeTag;
 };
+
+export const toManyNewCostumeTags = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  object: any
+): Promise<NewCostumeTag[]> => {
+  if (!Array.isArray(object)) {
+    throw new ParseError(
+      "Malformatted or missing costume tags array " + object
+    );
+  }
+  const manyNewCostumeTags = await Promise.all(object.map(toNewCostumeTag));
+  return manyNewCostumeTags;
+};

@@ -15,6 +15,7 @@ import testingRouter from "./controllers/testing";
 import profileRouter from "./controllers/profile";
 import costumeSetsRouter from "./controllers/costumeSets";
 import costumeTagsRouter from "./controllers/costumeTags";
+import adminRouter from "./controllers/admin";
 
 void mongoose.connect(config.MONGODB_URI as string);
 
@@ -38,6 +39,17 @@ app.use("/api/login", loginRouter);
 
 if (process.env.NODE_ENV === "test") {
   app.use("/api/testing", testingRouter);
+}
+
+if (process.env.NODE_ENV === "development") {
+  // route that I used to fill the database with initial costume data
+  app.use(
+    "/api/admin",
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    middleware.userExtractor,
+    middleware.isUserAdmin,
+    adminRouter
+  );
 }
 
 app.use(middleware.unknownEndpoint);

@@ -56,8 +56,8 @@ const addCostume = async (newCostume: NewCostume): Promise<ICostume> => {
 const addManyCostumes = async (
   manyNewCostumes: NewCostume[]
 ): Promise<ICostume[]> => {
-  const insertedCostumeIds = await Costume.insertMany(manyNewCostumes);
-  return insertedCostumeIds;
+  const addedCostumes = await Costume.insertMany(manyNewCostumes);
+  return addedCostumes;
 };
 
 export default {
