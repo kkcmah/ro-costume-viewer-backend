@@ -16,6 +16,21 @@ const logger_1 = __importDefault(require("./logger"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const usersService_1 = __importDefault(require("../services/usersService"));
 const types_1 = require("../types");
+const redirectHttps = (req, res, next) => {
+    var _a;
+    // sometimes heroku's routing uses http causing the app to not work because files arent served securely
+    // redirect http to https https://stackoverflow.com/questions/34862065/force-my-heroku-app-to-use-ssl-https
+    if (req.header("x-forwarded-proto") !== "https") {
+        if ((_a = req.headers.host) === null || _a === void 0 ? void 0 : _a.includes("localhost")) {
+            next();
+        }
+        else {
+            res.redirect(`https://${req.header("host")}${req.url}`);
+        }
+    }
+    else
+        next();
+};
 const tokenExtractor = (req, _res, next) => {
     const authorization = req.get("authorization");
     if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
@@ -76,6 +91,7 @@ const errorHandler = (error, _req, res, next) => {
     }
 };
 exports.default = {
+    redirectHttps,
     tokenExtractor,
     userExtractor,
     unknownEndpoint,

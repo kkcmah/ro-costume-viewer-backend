@@ -22,6 +22,9 @@ const costumeSets_1 = __importDefault(require("./controllers/costumeSets"));
 const costumeTags_1 = __importDefault(require("./controllers/costumeTags"));
 const admin_1 = __importDefault(require("./controllers/admin"));
 void mongoose_1.default.connect(config_1.default.MONGODB_URI);
+if (process.env.NODE_ENV === "production") {
+    app.use(middleware_1.default.redirectHttps);
+}
 app.use(express_1.default.static("client/build"));
 // do hard refresh via ctrl f5 to test helmet header changes,
 // otherwise cached version gets used and it looks like nothing changed

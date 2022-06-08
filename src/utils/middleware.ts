@@ -4,6 +4,18 @@ import usersService from "../services/usersService";
 import { Request, Response, NextFunction } from "express";
 import { UserToken, UserType } from "../types";
 
+const redirectHttps = (req: Request, res: Response, next: NextFunction) => {
+  // sometimes heroku's routing uses http causing the app to not work because files arent served securely
+  // redirect http to https https://stackoverflow.com/questions/34862065/force-my-heroku-app-to-use-ssl-https
+  if (req.header("x-forwarded-proto") !== "https") {
+    if (req.headers.host?.includes("localhost")) {
+      next();
+    } else {
+      res.redirect(`https://${req.header("host")}${req.url}`);
+    }
+  } else next();
+};
+
 const tokenExtractor = (req: Request, _res: Response, next: NextFunction) => {
   const authorization = req.get("authorization");
   if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
@@ -74,6 +86,7 @@ const errorHandler = (
 };
 
 export default {
+  redirectHttps,
   tokenExtractor,
   userExtractor,
   unknownEndpoint,

@@ -20,6 +20,9 @@ import adminRouter from "./controllers/admin";
 
 void mongoose.connect(config.MONGODB_URI as string);
 
+if (process.env.NODE_ENV === "production") {
+  app.use(middleware.redirectHttps);
+}
 app.use(express.static("client/build"));
 
 // do hard refresh via ctrl f5 to test helmet header changes,
