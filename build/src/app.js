@@ -22,6 +22,7 @@ const costumeSets_1 = __importDefault(require("./controllers/costumeSets"));
 const costumeTags_1 = __importDefault(require("./controllers/costumeTags"));
 const admin_1 = __importDefault(require("./controllers/admin"));
 void mongoose_1.default.connect(config_1.default.MONGODB_URI);
+app.use(express_1.default.static("client/build"));
 // do hard refresh via ctrl f5 to test helmet header changes,
 // otherwise cached version gets used and it looks like nothing changed
 app.use((0, helmet_1.default)({
@@ -32,7 +33,6 @@ app.use((0, helmet_1.default)({
     },
     crossOriginEmbedderPolicy: false,
 }));
-app.use(express_1.default.static("client/build"));
 app.use(express_1.default.json());
 // use the middleware in all routes
 app.use(middleware_1.default.tokenExtractor);

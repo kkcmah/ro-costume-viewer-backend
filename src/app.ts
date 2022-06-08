@@ -20,6 +20,8 @@ import adminRouter from "./controllers/admin";
 
 void mongoose.connect(config.MONGODB_URI as string);
 
+app.use(express.static("client/build"));
+
 // do hard refresh via ctrl f5 to test helmet header changes,
 // otherwise cached version gets used and it looks like nothing changed
 app.use(
@@ -33,7 +35,6 @@ app.use(
   })
 );
 
-app.use(express.static("client/build"));
 app.use(express.json());
 // use the middleware in all routes
 app.use(middleware.tokenExtractor);
