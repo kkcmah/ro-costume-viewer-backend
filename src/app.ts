@@ -1,4 +1,5 @@
 import config from "./utils/config";
+import path from "path";
 import express from "express";
 import helmet from "helmet";
 // eliminates try catch in async await by passing error to next middleware
@@ -32,7 +33,7 @@ app.use(
   })
 );
 
-app.use(express.static("build"));
+app.use(express.static("client/build"));
 app.use(express.json());
 // use the middleware in all routes
 app.use(middleware.tokenExtractor);
@@ -59,6 +60,13 @@ if (process.env.NODE_ENV === "development") {
     middleware.userExtractor,
     middleware.isUserAdmin,
     adminRouter
+  );
+}
+
+if (process.env.NODE_ENV === "production") {
+  // serve the frontend index file so that routes using react router dom get displayed correctly
+  app.use("*", (_req, res) =>
+    res.sendFile(path.join(__dirname, "../../client/build/index.html"))
   );
 }
 

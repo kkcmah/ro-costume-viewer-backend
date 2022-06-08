@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = __importDefault(require("./utils/config"));
+const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
 const helmet_1 = __importDefault(require("helmet"));
 // eliminates try catch in async await by passing error to next middleware
@@ -31,7 +32,7 @@ app.use((0, helmet_1.default)({
     },
     crossOriginEmbedderPolicy: false,
 }));
-app.use(express_1.default.static("build"));
+app.use(express_1.default.static("client/build"));
 app.use(express_1.default.json());
 // use the middleware in all routes
 app.use(middleware_1.default.tokenExtractor);
@@ -52,6 +53,10 @@ if (process.env.NODE_ENV === "development") {
     app.use("/api/admin", 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     middleware_1.default.userExtractor, middleware_1.default.isUserAdmin, admin_1.default);
+}
+if (process.env.NODE_ENV === "production") {
+    // serve the frontend index file so that routes using react router dom get displayed correctly
+    app.use("*", (_req, res) => res.sendFile(path_1.default.join(__dirname, "../../client/build/index.html")));
 }
 app.use(middleware_1.default.unknownEndpoint);
 app.use(middleware_1.default.errorHandler);
