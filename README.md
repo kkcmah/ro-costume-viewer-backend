@@ -2,9 +2,13 @@
 
 This project is built using Node, Express, and MongoDB.
 
-This is the backend for the frontend found here:
+The hosted version is here:
 
-https://github.com
+https://ro-costume-viewer.herokuapp.com/
+
+This is the backend for the frontend (with a better readme) found here:
+
+https://github.com/kkcmah/ro-costume-viewer-frontend
 
 ## .env config setup
 
